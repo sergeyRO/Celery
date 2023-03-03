@@ -34,6 +34,7 @@ services:
   app:
     build:
       context: .
+      dockerfile: Dockerfile
     environment:
       MONGO_DSN: "mongodb://app:1234_secret@db-mongo:27017/files?authSource=admin"
       CELERY_BROKER: "redis://db-redis:6379/4"
