@@ -6,6 +6,7 @@ networks:
 services:
 
   redis:
+    container_name: redis
     image: redis:7.0.0-alpine3.15
     ports:
       - "6379:6379"
@@ -15,6 +16,7 @@ services:
           - db-redis
 
   mongo:
+    container_name: mongo
     image: mongo:4.4.14
     restart: always
     ports:
