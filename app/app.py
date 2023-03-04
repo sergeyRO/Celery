@@ -3,9 +3,9 @@ from flask import Flask, jsonify, request
 from views import UpscaleView, TaskView, FileView
 from flask_pymongo import PyMongo
 from errors import ApiException
-
-import config
 from celery_app import celery_app
+import config
+
 
 app = Flask("app")
 
