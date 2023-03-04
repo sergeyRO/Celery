@@ -1,17 +1,15 @@
 #import nanoid
 from flask import Flask, jsonify, request
-from views import UpscaleView, TaskView, FileView
+from view import UpscaleView, TaskView, FileView
 from flask_pymongo import PyMongo
 from errors import ApiException
-from celery_app import celery_app
+from upscale import celeryApp
 import config
-
 
 app = Flask("app")
 
 mongo = PyMongo(app, uri=config.MONGO_DSN)
-
-celery_app.conf.update(app.config)
+celeryApp.conf.update(app.config)
 
 @app.errorhandler(ApiException)
 def error_handler(error: ApiException):

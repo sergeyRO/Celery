@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask import jsonify, request
-from upscale.upscale import upscale
+from upscale import upscale
 
 import os
 
@@ -21,7 +21,9 @@ class UpscaleView(MethodView):
             task = upscale.delay(os.path.join(UPLOAD_FOLDER, file.filename), f'new{file.filename}')
         # print(request.json['file'])
         # upscale(request.json["file"], f'new{request.json["file"]}')
-        return jsonify({'task_id': task.id})
+            return jsonify({'task_id': task.id})
+        else:
+            return jsonify({'error': 'Not tasks'})
 
 
 class TaskView(MethodView):

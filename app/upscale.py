@@ -1,8 +1,13 @@
 import cv2
 from cv2 import dnn_superres
-from flask.app import celery_app
+from celery import Celery
 
-@celery_app.task
+
+from config import CELERY_BROKER, MONGO_DSN
+
+celeryApp = Celery("app", backend=f"{MONGO_DSN}", broker=CELERY_BROKER)
+
+@celeryApp.task
 def upscale(input_path: str, output_path: str, model_path: str = 'EDSR_x2.pb') -> None:
     """
     :param input_path: путь к изображению для апскейла
