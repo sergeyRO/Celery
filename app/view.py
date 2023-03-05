@@ -4,7 +4,7 @@ from upscale import upscaleF
 
 import os
 
-UPLOAD_FOLDER = '.'
+UPLOAD_FOLDER = 'app'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
@@ -18,9 +18,9 @@ class UpscaleView(MethodView):
         file = request.files['file_upload']
         print(file)
         if file and allowed_file(file.filename):
+            #print(os.path.join(UPLOAD_FOLDER, file.filename))
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-            print(file.filename)
-            upscaleF(os.path.join(UPLOAD_FOLDER, file.filename), f'new{file.filename}')
+            upscaleF(os.path.join(UPLOAD_FOLDER, file.filename), os.path.join(UPLOAD_FOLDER, f'new{file.filename}'))
             #task = upscaleF.delay(os.path.join(UPLOAD_FOLDER, file.filename), f'new{file.filename}')
             #print(task)
             task = 1111
