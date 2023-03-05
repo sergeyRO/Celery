@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask import jsonify, request
-from upscale import upscale
+from upscale import upscaleF
 
 import os
 
@@ -16,19 +16,25 @@ def allowed_file(filename):
 class UpscaleView(MethodView):
     def post(self):
         file = request.files['file_upload']
+        print(file)
         if file and allowed_file(file.filename):
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-            task = upscale.delay(os.path.join(UPLOAD_FOLDER, file.filename), f'new{file.filename}')
+            print(file.filename)
+            upscaleF(os.path.join(UPLOAD_FOLDER, file.filename), f'new{file.filename}')
+            #task = upscaleF.delay(os.path.join(UPLOAD_FOLDER, file.filename), f'new{file.filename}')
+            #print(task)
+            task = 1111
         # print(request.json['file'])
         # upscale(request.json["file"], f'new{request.json["file"]}')
-            return jsonify({'task_id': task.id})
+            #return jsonify({'task_id': task.id})
+            return jsonify({'task_id': task})
         else:
             return jsonify({'error': 'Not tasks'})
 
 
 class TaskView(MethodView):
     def get(self, task_id: str):
-        task = upscale.AsyncResult(task_id)
+        task = upscaleF.AsyncResult(task_id)
         result = task.get(timeout = 3)
         return jsonify({'link_processed_file': result, 'state': task.state})
 

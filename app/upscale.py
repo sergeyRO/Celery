@@ -8,7 +8,7 @@ from config import CELERY_BROKER, MONGO_DSN
 celeryApp = Celery("app", backend=f"{MONGO_DSN}", broker=CELERY_BROKER)
 
 @celeryApp.task
-def upscale(input_path: str, output_path: str, model_path: str = 'EDSR_x2.pb') -> None:
+def upscaleF(input_path: str, output_path: str, model_path: str = 'EDSR_x2.pb') -> None:
     """
     :param input_path: путь к изображению для апскейла
     :param output_path:  путь к выходному файлу
