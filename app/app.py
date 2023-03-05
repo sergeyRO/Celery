@@ -28,8 +28,8 @@ def error_handler(error: ApiException):
 app.add_url_rule('/tasks/<string:task_id>', view_func=TaskView.as_view('task_status'), methods={'GET'})
 app.add_url_rule('/processed/<string:file>', view_func=FileView.as_view('processed_file'), methods={'GET'})
 app.add_url_rule('/upscale', view_func=UpscaleView.as_view('get_file'), methods={'POST'})
-app.run(debug=True, host='0.0.0.0', port=5000)
-
+app.run()
+#debug=True, host='0.0.0.0', port=5000
 
 
 '''
