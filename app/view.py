@@ -38,7 +38,7 @@ class TaskView(MethodView):
 
 class FileView(MethodView):
     def get(self, file: str):
-        ...
+        #...
         # data_ads = request.json
         # with Session() as session:
         #     new_ads = Ads(**data_ads)
