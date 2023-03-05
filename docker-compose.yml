@@ -32,6 +32,7 @@ services:
           - db-mongo
 
   app:
+    image: alpine
     build:
       context: .
       dockerfile: Dockerfile
@@ -40,7 +41,7 @@ services:
       CELERY_BROKER: "redis://db-redis:6379/4"
 
     ports:
-      - "5010:5010"
+      - "5000:5000"
     container_name: app
     depends_on:
       - mongo
@@ -52,6 +53,7 @@ services:
       - ./app:/app
 
   celery:
+    image: alpine
     build:
       context: .
       dockerfile: Dockerfile.celery
