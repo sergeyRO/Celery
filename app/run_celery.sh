@@ -1,1 +1,1 @@
-celery -A celery_app.celery_app worker -c 1
+celery -A app worker -c 1
