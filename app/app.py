@@ -7,9 +7,9 @@ from errors import ApiException
 from upscale import celeryApp
 import config
 
-app = Flask("app")
+app = Flask(__name__)
 
-#mongo = PyMongo(app, uri=config.MONGO_DSN)
+mongo = PyMongo(app, uri=config.MONGO_DSN)
 celeryApp.conf.update(app.config)
 
 @app.errorhandler(ApiException)

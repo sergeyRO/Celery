@@ -1,12 +1,12 @@
 import cv2
 from cv2 import dnn_superres
-
 from celery import Celery
 import os
 
 from config import CELERY_BROKER, MONGO_DSN
+#backend=f"{MONGO_DSN}"
+celeryApp = Celery('app', backend="", broker=CELERY_BROKER)
 
-celeryApp = Celery('app', backend=f"{MONGO_DSN}", broker=CELERY_BROKER)
 
 @celeryApp.task
 def upscale(input_path: str, output_path: str, model_path: str = "app\EDSR_x2.pb") -> None:
@@ -17,13 +17,13 @@ def upscale(input_path: str, output_path: str, model_path: str = "app\EDSR_x2.pb
     :return:
     """
     print(input_path)
-    # scaler = dnn_superres.DnnSuperResImpl_create()
-    # scaler.readModel(model_path)
-    # scaler.setModel('edsr', 2)
-    # image = cv2.imread(input_path)
-    # result = scaler.upsample(image)
-    # cv2.imwrite(output_path, result)
-    os.remove(input_path)
+    scaler = dnn_superres.DnnSuperResImpl_create()
+    scaler.readModel(model_path)
+    scaler.setModel('edsr', 2)
+    image = cv2.imread(input_path)
+    result = scaler.upsample(image)
+    cv2.imwrite(output_path, result)
+    #os.remove(input_path)
 
 
 
