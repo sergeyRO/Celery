@@ -1,1 +1,1 @@
-celery -A upscale worker -c 1
+celery -A upscale.celeryApp worker -c 1
