@@ -33,7 +33,7 @@ class UpscaleView(MethodView):
 
 class TaskView(MethodView):
     def get(self, task_id: str):
-        task = upscale.AsyncResult(task_id, app=celeryApp)
+        task = upscale.AsyncResult(task_id)#, app=celeryApp
         print(task)
         result = task.get(timeout=10)
         print(result)
