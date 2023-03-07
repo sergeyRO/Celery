@@ -3,9 +3,9 @@ from cv2 import dnn_superres
 from celery import Celery
 import os
 
-from config import CELERY_BROKER, MONGO_DSN
+from config import CELERY_BROKER, MONGO_DSN, CELERY_BACKEND
 #backend=f"{MONGO_DSN}"
-celeryApp = Celery('app', backend="", broker=CELERY_BROKER)
+celeryApp = Celery('app', backend=CELERY_BACKEND, broker=CELERY_BROKER)
 
 
 @celeryApp.task
