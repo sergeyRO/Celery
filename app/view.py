@@ -1,6 +1,8 @@
 from flask.views import MethodView
 from flask import jsonify, request
-from upscale import upscale, celeryApp
+from upscale import upscale
+
+
 
 import os
 
@@ -18,26 +20,22 @@ class UpscaleView(MethodView):
         file = request.files['file_upload']
         if file and allowed_file(file.filename):
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
-            # print(os.path.join(UPLOAD_FOLDER, file.filename))
-            # upscale(os.path.join(UPLOAD_FOLDER, file.filename), os.path.join(UPLOAD_FOLDER, f'new{file.filename}'))
             task = upscale.delay(os.path.join(UPLOAD_FOLDER, file.filename),
-                                 os.path.join(UPLOAD_FOLDER, f'new{file.filename}'))
-            # print(task)
-            # print(request.json['file'])
-            # upscale(request.json["file"], f'new{request.json["file"]}')
+                                 f'new{file.filename}')
             return jsonify({'task_id': task.id})
-            # return jsonify({'task_id': 11111})
         else:
             return jsonify({'error': 'Not tasks'})
 
 
 class TaskView(MethodView):
     def get(self, task_id: str):
-        task = upscale.AsyncResult(task_id)#, app=celeryApp
-        print(task)
-        result = task.get(timeout=10)
-        print(result)
-        return jsonify({'link_processed_file': result, 'state': task.state})
+        print(task_id)
+        task = upscale.AsyncResult(task_id)
+        #result = task.get(timeout=5)
+        if task.state == 'SUCCESS':
+            return jsonify({'link_processed_file': task.result, 'state': task.state})
+        else:
+            return jsonify({'state': task.state})
 
 
 class FileView(MethodView):

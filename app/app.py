@@ -3,29 +3,16 @@
 from flask import Flask, jsonify, request
 from view import UpscaleView, TaskView, FileView
 from flask_pymongo import PyMongo
-from errors import ApiException
-from upscale import celeryApp
+#from upscale import celeryApp
+
 import config
 
 app = Flask(__name__)
-
 mongo = PyMongo(app, uri=config.MONGO_DSN)
-celeryApp.conf.update(app.config)
-
-@app.errorhandler(ApiException)
-def error_handler(error: ApiException):
-    response = jsonify(
-        {
-            'status': 'error',
-            'message': error.message
-        }
-    )
-    response.status_code = error.status_code
-    return response
+#backend=f"{MONGO_DSN}"
 
 
-
-app.add_url_rule('/tasks/<string:task_id>', view_func=TaskView.as_view('task_status'), methods={'GET'})
+app.add_url_rule('/tasks/<task_id>', view_func=TaskView.as_view('task_status'), methods={'GET'})
 app.add_url_rule('/processed/<string:file>', view_func=FileView.as_view('processed_file'), methods={'GET'})
 app.add_url_rule('/upscale', view_func=UpscaleView.as_view('get_file'), methods={'POST'})
 app.run()
