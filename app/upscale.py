@@ -25,15 +25,8 @@ def upscale(input_path: str, output_path: str) -> None:
     :return:
     """
     scaler = model_cache()
-    # image = cv2.imread(input_path)
-    # result = scaler.upsample(image)
-    # cv2.imwrite(output_path, result)
-    # os.remove(input_path)
     image = cv2.imread(input_path)
-    result1 = scaler.upsample(image)
-    print(output_path.rsplit('.', 1)[1])
-    result, imgencode = cv2.imencode(output_path.rsplit('.', 1)[1], result1)
-    #cv2.imwrite(output_path, result)
-    print(result, type(imgencode))
-    return result
-    # return output_path
+    result = scaler.upsample(image)
+    cv2.imwrite(output_path, result)
+    os.remove(input_path)
+    return output_path

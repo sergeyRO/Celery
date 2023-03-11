@@ -1,9 +1,7 @@
 from flask.views import MethodView
 from flask import jsonify, request
 from upscale import upscale
-
-
-
+from flask import send_from_directory
 import os
 
 UPLOAD_FOLDER = '.'
@@ -21,7 +19,7 @@ class UpscaleView(MethodView):
         if file and allowed_file(file.filename):
             file.save(os.path.join(UPLOAD_FOLDER, file.filename))
             task = upscale.delay(os.path.join(UPLOAD_FOLDER, file.filename),
-                                 f'new{file.filename}')
+                                 f'./uploads/new{file.filename}')
             return jsonify({'task_id': task.id})
         else:
             return jsonify({'error': 'Not tasks'})
@@ -39,11 +37,5 @@ class TaskView(MethodView):
 
 
 class FileView(MethodView):
-    def get(self, file: str):
-        # ...
-        # data_ads = request.json
-        # with Session() as session:
-        #     new_ads = Ads(**data_ads)
-        #     session.add(new_ads)
-        #     session.commit()
-        return jsonify({'file': 'file'})
+    def get(self, filename):
+        return send_from_directory('uploads', filename)
