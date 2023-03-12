@@ -46,7 +46,7 @@ services:
       - "5000:5000"
     container_name: app
     depends_on:
-      - mongo
+      - mongodb
     networks:
       dev_network:
         aliases:
@@ -64,7 +64,7 @@ services:
       CELERY_BROKER: "redis://db-redis:6379/4"
     container_name: celery
     depends_on:
-      - mongo
+      - mongodb
     networks:
       dev_network:
     volumes:
