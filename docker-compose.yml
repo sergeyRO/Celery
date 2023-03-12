@@ -1,5 +1,11 @@
 version: '3.9'
 
+volumes:
+  mongodb-data:
+    driver: local
+  mongodb-log:
+    driver: local
+
 networks:
   dev_network:
 
@@ -24,13 +30,16 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_DATABASE: files
+      MONGO_INITDB_ROOT_ATABASE: files
     depends_on:
       - redis
     networks:
       dev_network:
         aliases:
           - db-mongo
+    volumes:
+      - mongodb-data:/data/db
+      - mongodb-log:/var/log/mongodb
 
   app:
     image: alpine
