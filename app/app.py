@@ -1,52 +1,57 @@
-#import nanoid
-#import waitress
 from flask import Flask, jsonify, request
-from view import UpscaleView, TaskView, FileView
-from flask_pymongo import PyMongo
-#from upscale import celeryApp
+from upscale import upscale
+from flask import send_from_directory
+import os
 
-import config
+from config import MONGO_DSN
+import pymongo
+from bson.binary import Binary
 
-app = Flask(__name__)
-mongo = PyMongo(app, uri=config.MONGO_DSN)
-#backend=f"{MONGO_DSN}"
-
-
-app.add_url_rule('/tasks/<task_id>', view_func=TaskView.as_view('task_status'), methods={'GET'})
-app.add_url_rule('/processed/<path:filename>', view_func=FileView.as_view('processed_file'), methods={'GET'})
-app.add_url_rule('/upscale', view_func=UpscaleView.as_view('get_file'), methods={'POST'})
-app.run()
-#debug=True, host='0.0.0.0', port=5000
+client = pymongo.MongoClient({MONGO_DSN}, serverSelectionTimeoutMS=5000)
+try:
+    print(client.server_info())
+except Exception:
+    print("Unable to connect to the server.")
 
 
-'''
-class ContextTask(celery_app.Task):
-    def __call__(self, *args, **kwargs):
-        with app.app_context():
-            return self.run(*args, **kwargs)
 
 
-celery_app.Task = ContextTask
+app_flask = Flask(__name__)
 
 
-class Comparison(MethodView):
-    def get(self, task_id):
-        task = get_task(task_id)
-        return jsonify({"status": task.status, "result": task.result})
-
-    def post(self):
-        image_ids = [self.save_image(field) for field in ("image_1", "image_2")]
-        task = match_photos.delay(*image_ids)
-        return jsonify({"task_id": task.id})
-
-    def save_image(self, field) -> str:
-        image = request.files.get(field)
-        return str(mongo.save_file(f"{nanoid.generate()}{image.filename}", image))
+UPLOAD_FOLDER = '.'
+ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif'}
 
 
-comparison_view = Comparison.as_view("comparison")
-app.add_url_rule(
-    "/comparison/<string:task_id>", view_func=comparison_view, methods=["GET"]
-)
-app.add_url_rule("/comparison/", view_func=comparison_view, methods=["POST"])
-'''
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
+
+
+@app_flask.route('/tasks/<task_id>', methods=['get'])
+def tasks(task_id: str):
+    print(task_id)
+    task = upscale.AsyncResult(task_id)
+    # result = task.get(timeout=5)
+    if task.state == 'SUCCESS':
+        return jsonify({'link_processed_file': task.result, 'state': task.state})
+    else:
+        return jsonify({'state': task.state})
+
+@app_flask.route('/processed/<path:filename>', methods=['get'])
+def get_file(filename):
+    return send_from_directory('uploads', filename)
+
+@app_flask.route('/upscale', methods=['post'])
+def picture_mod():
+    file = request.files['file_upload']
+    if file and allowed_file(file.filename):
+        file.save(os.path.join(UPLOAD_FOLDER, file.filename))
+        task = upscale.delay(os.path.join(UPLOAD_FOLDER, file.filename),
+                             f'./uploads/new_{file.filename}')
+        return jsonify({'task_id': task.id})
+    else:
+        return jsonify({'error': 'Not tasks'})
+
+
+app_flask.run()
