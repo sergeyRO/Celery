@@ -30,7 +30,7 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: admin
       MONGO_INITDB_ROOT_PASSWORD: password
-      MONGO_INITDB_ROOT_ATABASE: files
+      MONGO_INITDB_ROOT_DATABASE: files
     depends_on:
       - redis
     networks:
@@ -49,7 +49,7 @@ services:
     environment:
       MONGO_DSN: "mongodb://admin:password@127.0.0.1:27017/files"
       CELERY_BROKER: "redis://db-redis:6379/1"
-      CELERY_BACKEND: "redis:///db-redis:6379/2"
+      CELERY_BACKEND: "redis://db-redis:6379/2"
 
     ports:
       - "5000:5000"
@@ -71,6 +71,7 @@ services:
     environment:
       MONGO_DSN: "mongodb://admin:password@127.0.0.1:27017/files"
       CELERY_BROKER: "redis://db-redis:6379/1"
+      CELERY_BACKEND: "redis://db-redis:6379/2"
     container_name: celery
     depends_on:
       - mongodb
