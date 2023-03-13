@@ -32,7 +32,9 @@ def get_file(filename):
 
 @app_flask.route('/upscale', methods=['post'])
 def picture_mod():
+    print('tyt')
     file = request.files['file_upload']
+    print(file)
     if file and allowed_file(file.filename):
         file.save(os.path.join(UPLOAD_FOLDER, file.filename))
         task = upscale.delay(os.path.join(UPLOAD_FOLDER, file.filename),
