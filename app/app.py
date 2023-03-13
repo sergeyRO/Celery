@@ -41,5 +41,5 @@ def picture_mod():
     else:
         return jsonify({'error': 'Not tasks'})
 
-
-app_flask.run()
+if __name__ == "__main__":
+    app_flask.run(host="0.0.0.0", port=5001)
