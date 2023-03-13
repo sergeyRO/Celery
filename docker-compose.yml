@@ -8,18 +8,16 @@ volumes:
 
 networks:
   dev_network:
+    driver: bridge
 
 services:
-
   redis:
     container_name: redis
     image: redis:7.0.0-alpine3.15
     ports:
       - "6379:6379"
     networks:
-      dev_network:
-        aliases:
-          - db-redis
+      - dev_network
 
   mongodb:
     container_name: mongodb
@@ -34,12 +32,22 @@ services:
     depends_on:
       - redis
     networks:
-      dev_network:
-        aliases:
-          - db-mongo
+      - dev_network
+       
     volumes:
       - mongodb-data:/data/db
       - mongodb-log:/var/log/mongodb
+
+  nginx_proxy:
+    container_name: nginx_proxy
+    build: ./nginx
+    restart: unless-stopped
+    ports:
+      - 1333:80
+    depends_on:
+      - app
+    networks:
+      - dev_network
 
   app:
     build:
@@ -55,9 +63,8 @@ services:
     depends_on:
       - mongodb
     networks:
-      dev_network:
-        aliases:
-          - flask
+      - dev_network
+
     volumes:
       - ./app:/app
 
@@ -73,6 +80,6 @@ services:
     depends_on:
       - mongodb
     networks:
-      dev_network:
+      - dev_network
     volumes:
       - ./app:/app
