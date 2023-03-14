@@ -44,6 +44,6 @@ def upscale(input_path: str, output_path: str) -> None:
     result = scaler.upsample(image)
     cv2.imwrite(output_path, result)
     os.remove(input_path)
-    mongo.save_file(os.path.basename(output_path), result)
+    #mongo.save_file(os.path.basename(output_path), result)
     return os.path.basename(output_path)
     #return result
