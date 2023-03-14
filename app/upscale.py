@@ -5,22 +5,24 @@ from cv2 import dnn_superres
 from celery_app import celery
 import os
 from functools import lru_cache
-from config import MONGO_DSN
-import pymongo
-from bson.binary import Binary
+from mongoDB import db, fs
 
-client = pymongo.MongoClient({MONGO_DSN}, serverSelectionTimeoutMS=5000)
-try:
-    print(client.server_info())
-except Exception:
-    print("Unable to connect to the server.")
+# file="C:/Users/serge/Desktop/lama_300px.png"
+# with open(file, 'rb') as f:
+#     contents = f.read()
+# res = fs.put(contents, filename="lama_300px.png")
+# print(res)
+#
+# cursor = db.fs.chunks.find({'files_id': res})
+# print(cursor)
 
-# def insert_image(request):
-#     with open(request.GET["image_name"], "rb") as image_file:
-#         encoded_string = base64.b64encode(image_file.read())
-#     print(encoded_string)
-#     abc=db.database_name.insert({"image":encoded_string})
-#     return HttpResponse("inserted")
+def mongo_save_file(file, filename):
+    with open(file, 'rb') as f:
+        contents = f.read()
+    res = fs.put(contents, filename=filename)
+    return res
+    # cursor = db.fs.chunks.find({'files_id': res})
+    # print(cursor)
 
 @lru_cache
 def model_cache():
@@ -42,8 +44,8 @@ def upscale(input_path: str, output_path: str) -> None:
     scaler = model_cache()
     image = cv2.imread(input_path)
     result = scaler.upsample(image)
-    cv2.imwrite(output_path, result)
+    #cv2.imwrite(output_path, result)
+    res = mongo_save_file(result, os.path.basename(output_path))
     os.remove(input_path)
-    #mongo.save_file(os.path.basename(output_path), result)
-    return os.path.basename(output_path)
-    #return result
+    #return os.path.basename(output_path)
+    return res
