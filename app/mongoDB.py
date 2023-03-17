@@ -1,7 +1,7 @@
 from config import MONGO_DSN
 import pymongo
 import gridfs
-MONGO_DSN="mongodb://admin:password@127.0.0.1:27017/"
+#MONGO_DSN="mongodb://admin:password@127.0.0.1:27017/"
 connection = pymongo.MongoClient({MONGO_DSN}, serverSelectionTimeoutMS=5000)
 db = connection['images']
 fs = gridfs.GridFS(db)
