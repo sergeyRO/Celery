@@ -1,28 +1,35 @@
-import base64
-
+import numpy as np
+from PIL import Image
 import cv2
 from cv2 import dnn_superres
 from celery_app import celery
 import os
 from functools import lru_cache
-from mongoDB import db, fs
+from mongoDB import fs, ImageCollection
 
-# file="C:/Users/serge/Desktop/lama_300px.png"
-# with open(file, 'rb') as f:
-#     contents = f.read()
-# res = fs.put(contents, filename="lama_300px.png")
-# print(res)
-#
-# cursor = db.fs.chunks.find({'files_id': res})
-# print(cursor)
+def mongo_save_file(file):
+    imageString = file.tobytes()
+    imageID = fs.put(imageString, encoding='utf-8')
+    meta = {
+        'name': str(imageID),
+        'images': [
+            {
+                'imageID': imageID,
+                'shape': file.shape,
+                'dtype': str(file.dtype)
+            }
+        ]
+    }
+    ImageCollection.insert_one(meta)
+    return str(imageID)
 
-def mongo_save_file(file, filename):
-    with open(file, 'rb') as f:
-        contents = f.read()
-    res = fs.put(contents, filename=filename)
+def load_file(oid):
+    image = ImageCollection.find_one({'name': oid})['images'][0]
+    gOut = fs.get(image['imageID'])
+    img = np.frombuffer(gOut.read(), dtype=np.uint8)
+    img = np.reshape(img, image['shape'])
+    res = Image.fromarray(img)
     return res
-    # cursor = db.fs.chunks.find({'files_id': res})
-    # print(cursor)
 
 @lru_cache
 def model_cache():
@@ -45,7 +52,7 @@ def upscale(input_path: str, output_path: str) -> None:
     image = cv2.imread(input_path)
     result = scaler.upsample(image)
     #cv2.imwrite(output_path, result)
-    res = mongo_save_file(result, os.path.basename(output_path))
+    res = mongo_save_file(result)
     os.remove(input_path)
     #return os.path.basename(output_path)
     return res

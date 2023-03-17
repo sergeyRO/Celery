@@ -10,3 +10,5 @@ python-dotenv==1.0.0
 requests==2.20.1
 redis
 pymongo==3.11
+pillow
+numpy
