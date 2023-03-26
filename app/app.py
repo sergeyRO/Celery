@@ -22,7 +22,7 @@ def allowed_file(filename):
 def tasks(task_id: str):
     print(task_id)
     task = upscale.AsyncResult(task_id)
-    # result = task.get(timeout=5)
+    #task = task.get(timeout=60)
     if task.state == 'SUCCESS':
         return jsonify({'file_id': task.result, 'state': task.state})
     else:
@@ -30,6 +30,7 @@ def tasks(task_id: str):
 
 @app_flask.route('/processed/<oid>', methods=['get'])
 def get_file(oid):
+    print(oid)
     pil_img = load_file(oid)
     img_io = io.BytesIO()
     pil_img.save(img_io, 'JPEG', quality=100)
